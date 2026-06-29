@@ -10,3 +10,23 @@ Concernant le contenu de la base de données, celle-ci devra se nommer kennelDB 
 * Des associations clients-adresses
 * Des chiens (nom, date de naissance, race, statut de stérilisation)
 * Des chats (nom, date de naissance, race, statut de stérilisation)
+
+--- 
+
+## Correction
+
+```dockerfile
+# Dockerfile
+
+FROM mysql:9
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+ENV MYSQL_ROOT_PASSWORD password
+# ou
+ENV MYSQL_ROOT_PASSWORD=password
+
+# docker build -t exo-03-database . => Pour build l'image
+
+# docker run -d -p 3306:3306 --name exo-03-db -v exo-03-data:/var/lib/ mysql exo-03-database 
+```
