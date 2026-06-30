@@ -1,0 +1,28 @@
+variable_textuelle: "valeur avec espace"
+variable_numerique: 123
+variable_booleenne: true
+
+variable_listing_vide: []
+
+variable_listing: [valeur, 132, true]
+
+variable_listing_bis:
+  - valeur
+  - 132
+  - true
+
+variable_objet_vide: {}
+
+variable_objet: { keyA: valeur, keyB: 1234 }
+
+variable_objet_bis:
+  keyA: valeur
+  keyB: 1234
+
+variable_listing_objects:
+  - keyA: valeur
+    keyB: 1234
+  - keyA: valeurBis
+    keyB: 5678
+
+#  Ceci est un commentaire

@@ -1,0 +1,45 @@
+services: 
+  database:
+    container_name: exo-04-db
+    image: mysql:9
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: kennelDB
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 1m
+      timeout: 20s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - source: exo-04-data
+        target: /var/lib/mysql
+  
+  api: 
+    container_name: exo-04-api
+    # build: ./dossier/qui/contient/dockerfile
+    build: 
+      context: /emplacement/du/contexte/de/build
+      dockerfile: nom-fichier.dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: exo-04-db
+      DATABASE_PORT: 3306
+      DATABASE_NAME: kennelDB
+      DATABASE_USER: admin
+      DATABASE_PASSWORD: password
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+
+volumes:
+  exo-04-data: {}
+
+# Pour tout déployer => docker compose up
+# Pour tout déployer en mode détaché => docker compose up -d
+# Pour tout retirer de l'environnement Docker => docker compose down

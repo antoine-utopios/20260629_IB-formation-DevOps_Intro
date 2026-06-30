@@ -27,3 +27,62 @@ Pour réaliser une dockerization d'un applicatif Java, il est nécessaire de con
 * `mvn dependency:go-offline -B`: La commande servant à Maven pour installer lesdites dépendances
 * `mvn clean package -DskipTests` Commande servant à la création d'une archive au format `.jar` servant à Java pour lancer l'applicatif par la suite. Cette archive va se créer dans le dossier `target` du projet.
 * `java -jar archive.jar`: Permet, via le Runtime Java, de demander le lancement d'un applicatif Java précédemment packagé et archivé au format `.jar`.
+
+
+---
+
+## Correction 
+
+```dockerfile
+# database.dockerfile
+
+FROM mysql:9
+
+ENV MYSQL_ALLOW_EMPTY_PASSWORD true
+ENV MYSQL_DATABASE kennelDB
+ENV MYSQL_USER admin
+ENV MYSQL_PASSWORD password
+
+# docker network create exo-04-net
+# docker run -d --name exo-04-db -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_DATABASE=kennelDB -e MYSQL_USER=admin -e MYSQL_PASSWORD=password -v exo-04-data:/var/lib/mysql --network exo-04-net mysql:9
+
+# OU 
+
+# docker build -t exo-04-db -f database.dockerfile .
+# docker run -d -v exo-04-data:/var/lib/mysql --network exo-04-net exo-04-db
+```
+
+```dockerfile
+# api.dockerfile
+
+FROM maven AS builder
+
+WORKDIR /src
+
+COPY pom.xml .
+
+RUN mvn dependency:go-offline -B
+
+COPY src .
+
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin
+
+COPY --from=builder /src/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENV DATABASE_HOST exo-04-db
+ENV DATABASE_PORT 3306
+ENV DATABASE_NAME kennelDB
+ENV DATABASE_USER admin
+ENV DATABASE_PASSWORD password
+
+ENV SPRING_PROFILES_ACTIVE prod
+
+CMD ["java", "-jar", "app.jar"]
+
+# docker build -t exo-04-api -f api.dockerfile .
+# docker run -d --network exo-04-net -p 8080:8080 exo-04-api
+```
